@@ -1,0 +1,11 @@
+{
+  "name": "@carapace-ai/express",
+  "version": "0.1.0",
+  "description": "Express middleware for capturing Carapace telemetry and local policy signals.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  }
+}
+
