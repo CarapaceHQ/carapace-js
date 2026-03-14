@@ -6,7 +6,7 @@ JavaScript SDKs and middleware for Carapace.
 
 The first package owned by this repo is:
 
-- `@carapace-ai/express`
+- `@carapacehq/express`
 
 Its job is to capture risk telemetry from an Express app, normalize those events, and hand them to local scoring and policy hooks.
 
@@ -25,7 +25,7 @@ This repo will own:
 
 ## Near-Term Milestones
 
-1. Define the middleware surface for `@carapace-ai/express`.
+1. Define the middleware surface for `@carapacehq/express`.
 2. Align emitted events with `carapace-schemas`.
 3. Provide a local-first reference integration for `carapace-playground`.
 
@@ -36,4 +36,3 @@ This repo is intentionally skeletal until the shared schema contracts are stabil
 ## License
 
 Apache-2.0
-

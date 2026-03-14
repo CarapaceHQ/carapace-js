@@ -1,5 +1,5 @@
 {
-  "name": "@carapace-ai/express",
+  "name": "@carapacehq/express",
   "version": "0.1.0",
   "description": "Express middleware for capturing Carapace telemetry and local policy signals.",
   "type": "module",
@@ -8,4 +8,3 @@
     ".": "./src/index.js"
   }
 }
-
