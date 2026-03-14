@@ -2,6 +2,8 @@
 
 JavaScript SDKs and middleware for Carapace.
 
+Support Carapace on Patreon: <https://www.patreon.com/carapacehq>
+
 ## First Package
 
 The first package owned by this repo is:
