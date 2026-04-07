@@ -9,7 +9,6 @@
   ],
   "scripts": {
     "lint": "node -e \"console.log('lint not configured yet')\"",
-    "test": "node -e \"console.log('tests not configured yet')\""
+    "test": "npm run test --workspace @carapacehq/express"
   }
 }
-
