@@ -4,9 +4,22 @@
   "description": "Express middleware for capturing Carapace telemetry and local policy signals.",
   "type": "module",
   "main": "src/index.js",
+  "files": [
+    "src"
+  ],
   "exports": {
     ".": "./src/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CarapaceHQ/carapace-js.git",
+    "directory": "packages/express"
+  },
+  "bugs": {
+    "url": "https://github.com/CarapaceHQ/carapace-js/issues"
+  },
+  "homepage": "https://github.com/CarapaceHQ/carapace-js/tree/main/packages/express#readme",
+  "license": "Apache-2.0",
   "scripts": {
     "test": "node --test"
   }

@@ -13,6 +13,14 @@ This package now supports the first Carapace slice:
 
 ## Quick Start
 
+Install the middleware package:
+
+```bash
+npm install @carapacehq/express
+```
+
+Attach the local inspector to an Express app:
+
 ```js
 import { createCarapaceInspector } from "@carapacehq/express";
 
@@ -20,7 +28,7 @@ const inspector = createCarapaceInspector();
 app.use(inspector.middleware);
 ```
 
-For shared rule evaluation, pass an `evaluateEvents(currentEvents, priorEvents)` function.
+For shared rule evaluation, pass an `evaluateEvents(currentEvents, priorEvents)` function. The first maintained rule pack lives in `@carapacehq/detection-rules`.
 
 The function should return:
 
@@ -29,3 +37,12 @@ The function should return:
 - `reasons`
 - `score`
 - `action`
+
+## Release Candidate Checks
+
+Before publishing a release candidate:
+
+```bash
+npm test
+npm pack --dry-run --workspace @carapacehq/express
+```
