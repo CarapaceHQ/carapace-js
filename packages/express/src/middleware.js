@@ -16,6 +16,7 @@ import {
   detectPromptInjection,
   detectToolAbuse,
 } from "./evaluator.js";
+import { createAgentActionReceipt } from "./receipts.js";
 import { createEventStore } from "./store.js";
 
 function setHeader(res, name, value) {
@@ -69,13 +70,21 @@ export function createCarapaceMiddleware({
   policyHeader = DEFAULT_POLICY_HEADER,
   scoreHeader = DEFAULT_SCORE_HEADER,
   eventStore = createEventStore(),
+  receiptStore = createEventStore(),
   velocityTracker = createInMemoryVelocityTracker(),
   burstThreshold = 5,
+  onReceipt,
 } = {}) {
   const emit = (event) => {
     eventStore.add(event);
     if (onEvent) {
       onEvent(event);
+    }
+  };
+  const emitReceipt = (receipt) => {
+    receiptStore.add(receipt);
+    if (onReceipt) {
+      onReceipt(receipt);
     }
   };
 
@@ -113,8 +122,19 @@ export function createCarapaceMiddleware({
     attachOutcome(req, res, requestOutcome, { policyHeader, scoreHeader });
 
     if (requestOutcome.action === "block") {
-      emit(
-        createPolicyActionEvent(req, requestOutcome, requestOutcome.reasons, { now }),
+      const policyEvent = createPolicyActionEvent(
+        req,
+        requestOutcome,
+        requestOutcome.reasons,
+        { now },
+      );
+      emit(policyEvent);
+      emitReceipt(
+        createAgentActionReceipt({
+          events: [...currentEvents, policyEvent],
+          outcome: requestOutcome,
+          now,
+        }),
       );
       sendBlocked(res, {
         error: "Request blocked by Carapace policy.",
@@ -151,8 +171,17 @@ export function createCarapaceMiddleware({
           }
 
           attachOutcome(req, res, finalOutcome, { policyHeader, scoreHeader });
-          emit(
-            createPolicyActionEvent(req, finalOutcome, finalOutcome.reasons, {
+          const policyEvent = createPolicyActionEvent(
+            req,
+            finalOutcome,
+            finalOutcome.reasons,
+            { now },
+          );
+          emit(policyEvent);
+          emitReceipt(
+            createAgentActionReceipt({
+              events: [...currentEvents, ...responseEvents, policyEvent],
+              outcome: finalOutcome,
               now,
             }),
           );
@@ -168,7 +197,12 @@ export function createCarapaceMiddleware({
 
 export function createCarapaceInspector(options = {}) {
   const eventStore = options.eventStore || createEventStore();
-  const middleware = createCarapaceMiddleware({ ...options, eventStore });
+  const receiptStore = options.receiptStore || createEventStore();
+  const middleware = createCarapaceMiddleware({
+    ...options,
+    eventStore,
+    receiptStore,
+  });
 
   return {
     middleware,
@@ -177,6 +211,7 @@ export function createCarapaceInspector(options = {}) {
     },
     clearEvents() {
       eventStore.clear();
+      receiptStore.clear();
     },
     getLatestOutcome() {
       const policyActions = eventStore
@@ -184,6 +219,12 @@ export function createCarapaceInspector(options = {}) {
         .filter((event) => event.type === "policy_action");
 
       return policyActions.at(-1)?.policy || null;
+    },
+    listReceipts() {
+      return receiptStore.list();
+    },
+    getLatestReceipt() {
+      return receiptStore.list().at(-1) || null;
     },
   };
 }

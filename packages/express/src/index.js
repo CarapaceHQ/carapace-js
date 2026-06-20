@@ -17,4 +17,5 @@ export {
   createCarapaceInspector,
   createCarapaceMiddleware,
 } from "./middleware.js";
+export { createAgentActionReceipt } from "./receipts.js";
 export { createEventStore } from "./store.js";

@@ -10,6 +10,7 @@ This package now supports the first Carapace slice:
 - run local rules or scoring hooks
 - expose narrow policy outcomes: `allow`, `log`, `rate_limit`, `block`
 - attach `action`, `flags`, `reasons`, and `score` to the request context
+- generate `agent_action_receipt` records for explainable action evidence
 
 ## Quick Start
 
@@ -28,6 +29,12 @@ const inspector = createCarapaceInspector();
 app.use(inspector.middleware);
 ```
 
+Read the latest receipt:
+
+```js
+const receipt = inspector.getLatestReceipt();
+```
+
 For shared rule evaluation, pass an `evaluateEvents(currentEvents, priorEvents)` function. The first maintained rule pack lives in `@carapacehq/detection-rules`.
 
 The function should return:
@@ -37,6 +44,8 @@ The function should return:
 - `reasons`
 - `score`
 - `action`
+
+Receipts include observed event types, rule hits, score, flags, reasons, and the policy action applied to the request.
 
 ## Release Candidate Checks
 

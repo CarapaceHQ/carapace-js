@@ -102,6 +102,12 @@ test("blocks prompt injection requests and explains why", () => {
     inspector.listEvents().map((event) => event.type),
     ["api_request", "prompt_injection_signal", "policy_action"],
   );
+  assert.equal(inspector.listReceipts().length, 1);
+  assert.equal(inspector.getLatestReceipt().policy.action, "block");
+  assert.equal(
+    inspector.getLatestReceipt().ruleHits[0].ruleId,
+    "carapace.prompt-injection",
+  );
 });
 
 test("flags velocity bursts after repeated requests", () => {
@@ -141,6 +147,7 @@ test("records auth failures from downstream response status", () => {
     inspector.listEvents().map((event) => event.type),
     ["api_request", "auth_failure", "policy_action"],
   );
+  assert.equal(inspector.getLatestReceipt().action.summary, "GET /v1/admin");
 });
 
 test("emits tool abuse signals for suspicious tool execution requests", () => {
@@ -163,4 +170,22 @@ test("emits tool abuse signals for suspicious tool execution requests", () => {
     inspector.listEvents().map((event) => event.type),
     ["api_request", "tool_abuse_signal", "policy_action"],
   );
+  assert.equal(inspector.getLatestReceipt().risk.flags.includes("tool_abuse"), true);
+});
+
+test("stores receipts separately from raw events", () => {
+  const inspector = createCarapaceInspector();
+  const req = createReq({
+    body: { message: "Summarize this sermon." },
+  });
+  const res = createRes();
+
+  inspector.middleware(req, res, () => {
+    res.end("ok");
+  });
+
+  assert.equal(inspector.listEvents().some((event) => event.type === "agent_action_receipt"), false);
+  assert.equal(inspector.listReceipts().length, 1);
+  assert.equal(inspector.getLatestReceipt().type, "agent_action_receipt");
+  assert.deepEqual(inspector.getLatestReceipt().risk.flags, []);
 });
